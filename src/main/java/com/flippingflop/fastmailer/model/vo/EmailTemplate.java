@@ -1,7 +1,9 @@
 package com.flippingflop.fastmailer.model.vo;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "email_template", indexes = {
         @Index(name = "IDX_IS_DELETED", columnList = "IS_DELETED")
 })
@@ -47,6 +50,14 @@ public class EmailTemplate {
         if (isDeleted && deletedAt == null) {
             deletedAt = Instant.now();
         }
+    }
+
+    @Builder
+    public EmailTemplate(String templateName, String subject, String htmlContents, List<TemplateVariable> templateVariableList) {
+        this.templateName = templateName;
+        this.subject = subject;
+        this.htmlContents = htmlContents;
+        this.templateVariableList = templateVariableList;
     }
 
 }
