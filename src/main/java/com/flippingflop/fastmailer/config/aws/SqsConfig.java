@@ -1,4 +1,4 @@
-package com.flippingflop.fastmailer.config.sqs;
+package com.flippingflop.fastmailer.config.aws;
 
 import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
