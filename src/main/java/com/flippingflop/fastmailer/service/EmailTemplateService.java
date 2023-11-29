@@ -5,6 +5,7 @@ import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
 import com.flippingflop.fastmailer.rest.dto.ApiResponse;
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequest;
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
+import com.flippingflop.fastmailer.util.SesUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class EmailTemplateService {
 
+    final SesUtils sesUtils;
     final EmailTemplateValidator emailTemplateValidator;
     final EmailTemplateRepository emailTemplateRepository;
 
@@ -24,6 +26,9 @@ public class EmailTemplateService {
         /* Save */
         EmailTemplate emailTemplate = req.toVo();
         emailTemplateRepository.save(emailTemplate);
+
+        /* Upload template to SES */
+        sesUtils.saveEmailTemplate(req.getTemplateName(), req.getSubject(), req.getHtmlContents(), null);
 
         /* res */
         SaveEmailTemplateResponse res = new SaveEmailTemplateResponse(emailTemplate.getId());
