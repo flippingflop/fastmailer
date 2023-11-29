@@ -10,7 +10,8 @@ import java.time.Instant;
 @Getter
 @Entity
 @Table(name = "email", indexes = {
-        @Index(name = "IDX_IS_DELETED", columnList = "IS_DELETED")
+        @Index(name = "IDX_IS_DELETED", columnList = "IS_DELETED"),
+        @Index(name = "IDX_UNIQUE_KEY", columnList = "UNIQUE_KEY", unique = true)
 })
 public class Email {
 
@@ -18,6 +19,9 @@ public class Email {
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
+    @Column(name = "UNIQUE_KEY")
+    String uniqueKey;
 
     @Column(name = "RECIPIENT_EMAIL", nullable = false)
     String recipientEmail;
