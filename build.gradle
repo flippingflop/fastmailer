@@ -28,6 +28,7 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-secrets-manager:3.0.3'
     implementation 'io.awspring.cloud:spring-cloud-aws-sqs:3.0.3'
     implementation 'com.amazonaws:aws-java-sdk-ses:1.12.595'
+    implementation 'com.google.code.gson:gson:2.10.1'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
