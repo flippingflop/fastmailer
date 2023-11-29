@@ -5,10 +5,12 @@ import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateReque
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequestTest;
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
 import com.flippingflop.fastmailer.test.MysqlTestContainerConfig;
+import com.flippingflop.fastmailer.util.SesUtils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ class EmailTemplateServiceTest {
 
     @Autowired
     EmailTemplateService emailTemplateService;
+    @MockBean
+    SesUtils sesUtilsMock;
 
     @Nested
     class saveEmailTemplate {
@@ -31,6 +35,8 @@ class EmailTemplateServiceTest {
         @Test
         void saveEmailTemplate_success() {
             /* given */
+            doNothing().when(sesUtilsMock).saveEmailTemplate(anyString(), anyString(), anyString(), any());
+
             SaveEmailTemplateRequest req = new SaveEmailTemplateRequestTest();
 
             /* when */
