@@ -7,4 +7,6 @@ public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Lo
 
     EmailTemplate findByTemplateNameAndIsDeleted(String templateName, Boolean isDeleted);
 
+    boolean existsByTemplateNameAndIsDeleted(String templateName, Boolean isDeleted);
+
 }

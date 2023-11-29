@@ -1,0 +1,14 @@
+POST {{host}}/api/v1/email-template
+Content-Type: application/json
+
+{
+  "templateName" : "template-name",
+  "subject" : "Hello, this is the subject of email.",
+  "htmlContents" : "<p>Your {{var1}} is properly set.</p>",
+  "templateVariableList" : [
+    {
+      "keyName" : "var1",
+      "defaultValue" : "var1Default"
+    }
+  ]
+}

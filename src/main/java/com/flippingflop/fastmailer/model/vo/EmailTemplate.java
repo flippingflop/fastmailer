@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@SuperBuilder
 @Table(name = "email_template", indexes = {
         @Index(name = "IDX_IS_DELETED", columnList = "IS_DELETED")
 })
@@ -36,12 +40,14 @@ public class EmailTemplate {
     @Column(name = "CREATED_AT")
     Instant createdAt;
 
-    @Column(name = "IS_DELETED")
+    @Builder.Default
+    @Column(name = "IS_DELETED", nullable = false)
     Boolean isDeleted = false;
 
     @Column(name = "DELETED_AT")
     Instant deletedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "emailTemplate", cascade = CascadeType.PERSIST)
     List<TemplateVariable> templateVariableList = new ArrayList<>();
 
@@ -52,12 +58,18 @@ public class EmailTemplate {
         }
     }
 
-    @Builder
-    public EmailTemplate(String templateName, String subject, String htmlContents, List<TemplateVariable> templateVariableList) {
-        this.templateName = templateName;
-        this.subject = subject;
-        this.htmlContents = htmlContents;
-        this.templateVariableList = templateVariableList;
+    public void removeTemplateVariable(TemplateVariable templateVariable) {
+        templateVariable.setEmailTemplate(null);
+        this.templateVariableList.remove(templateVariable);
+    }
+
+    public void addTemplateVariable(TemplateVariable templateVariable) {
+        if (templateVariable.getEmailTemplate() != null) {
+            templateVariable.getEmailTemplate().removeTemplateVariable(templateVariable);
+        }
+
+        this.templateVariableList.add(templateVariable);
+        templateVariable.setEmailTemplate(this);
     }
 
 }
