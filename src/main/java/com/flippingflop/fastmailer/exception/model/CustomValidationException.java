@@ -7,6 +7,10 @@ public class CustomValidationException extends RuntimeException {
     @Getter
     int code;
 
+    public CustomValidationException(String message) {
+        super(message);
+    }
+
     public CustomValidationException(int code, String message) {
         super(message);
 
