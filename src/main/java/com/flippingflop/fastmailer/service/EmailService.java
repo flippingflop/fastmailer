@@ -31,7 +31,7 @@ public class EmailService {
     @Transactional
     public void queueTemplateEmail(String recipientEmail, String senderEmail, String templateName, Map<String, String> templateData, String uniqueKey) {
         /* Validate */
-        emailValidator.sendTemplateEmailValidate(recipientEmail, senderEmail, templateName, templateData, uniqueKey);
+        emailValidator.queueTemplateEmailValidate(recipientEmail, senderEmail, templateName, templateData, uniqueKey);
 
         /* Save email as a pending state */
         // Load template

@@ -20,14 +20,14 @@ public class EmailValidator {
     final EmailTemplateRepository emailTemplateRepository;
 
     /**
-     * Validator method for sendTemplateEmail.
+     * Validator method for queueTemplateEmail.
      * @param recipientEmail (required)
      * @param senderEmail    (optional)
      * @param templateName   (required)
      * @param templateData   (optional)
      * @param uniqueKey      (optional)
      */
-    public void sendTemplateEmailValidate(String recipientEmail, String senderEmail, String templateName, Map<String, String> templateData, String uniqueKey) {
+    public void queueTemplateEmailValidate(String recipientEmail, String senderEmail, String templateName, Map<String, String> templateData, String uniqueKey) {
         /* Check if required variable provided. */
         if (!StringUtils.hasLength(recipientEmail) || !StringUtils.hasLength(templateName)) {
             throw new CustomValidationException(1, "Required variable not provided.");

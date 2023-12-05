@@ -31,13 +31,13 @@ class EmailValidatorTest {
     EmailValidator emailValidator;
 
     @Nested
-    class sendTemplateEmailValidate {
+    class queueTemplateEmailValidate {
 
         @Test
         void requiredVariableNotProvided() {
             // Recipient email not provided
             CustomValidationException e1 = assertThrows(CustomValidationException.class,
-                    () -> emailValidator.sendTemplateEmailValidate(
+                    () -> emailValidator.queueTemplateEmailValidate(
                             "",
                             null,
                             SequenceUtils.getString(12),
@@ -49,7 +49,7 @@ class EmailValidatorTest {
 
             // Template name not provided
             CustomValidationException e2 = assertThrows(CustomValidationException.class,
-                    () -> emailValidator.sendTemplateEmailValidate(
+                    () -> emailValidator.queueTemplateEmailValidate(
                             SequenceUtils.getString(12) + "@example.com",
                             null,
                             "",
@@ -63,7 +63,7 @@ class EmailValidatorTest {
         @Test
         void templateNameNotExists() {
             CustomValidationException e = assertThrows(CustomValidationException.class,
-                    () -> emailValidator.sendTemplateEmailValidate(
+                    () -> emailValidator.queueTemplateEmailValidate(
                             SequenceUtils.getString(12) + "@example.com",
                             null,
                             SequenceUtils.getString(12),
@@ -84,7 +84,7 @@ class EmailValidatorTest {
 
             /* when */
             CustomValidationException e = assertThrows(CustomValidationException.class,
-                    () -> emailValidator.sendTemplateEmailValidate(
+                    () -> emailValidator.queueTemplateEmailValidate(
                             SequenceUtils.getString(12) + "@example.com",
                             null,
                             emailTemplate.getTemplateName(),
