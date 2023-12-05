@@ -1,8 +1,10 @@
 package com.flippingflop.fastmailer.service;
 
+import com.flippingflop.fastmailer.exception.model.CustomValidationException;
 import com.flippingflop.fastmailer.model.vo.EmailTemplate;
 import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
 import com.flippingflop.fastmailer.rest.dto.ApiResponse;
+import com.flippingflop.fastmailer.rest.dto.emailTemplate.LoadEmailTemplateResponse;
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequest;
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
 import com.flippingflop.fastmailer.util.SesUtils;
@@ -33,6 +35,21 @@ public class EmailTemplateService {
         /* res */
         SaveEmailTemplateResponse res = new SaveEmailTemplateResponse(emailTemplate.getId());
         return new ApiResponse<>(1, "Template saved.", res);
+    }
+
+    public ApiResponse<LoadEmailTemplateResponse> loadEmailTemplate(String templateName) {
+        /* Load template from SES and database */
+        EmailTemplate templateFromSes = sesUtils.loadEmailTemplate(templateName);
+        EmailTemplate templateFromDb = emailTemplateRepository.findByTemplateNameAndIsDeleted(templateName, false);
+
+        if (templateFromSes == null && templateFromDb == null) {
+            throw new CustomValidationException(1, "Template does not exist.");
+        }
+
+        /* Template to response. The one from SES has priority. */
+        EmailTemplate responseTemplate = templateFromSes != null ? templateFromSes : templateFromDb;
+        LoadEmailTemplateResponse res = new LoadEmailTemplateResponse(responseTemplate, templateFromSes != null, templateFromDb != null);
+        return new ApiResponse<>(1, "Template loaded.", res);
     }
 
 }

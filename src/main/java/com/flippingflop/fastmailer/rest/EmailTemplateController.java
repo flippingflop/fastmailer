@@ -1,14 +1,12 @@
 package com.flippingflop.fastmailer.rest;
 
 import com.flippingflop.fastmailer.rest.dto.ApiResponse;
+import com.flippingflop.fastmailer.rest.dto.emailTemplate.LoadEmailTemplateResponse;
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequest;
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
 import com.flippingflop.fastmailer.service.EmailTemplateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +22,15 @@ public class EmailTemplateController {
     @PostMapping("")
     public ApiResponse<SaveEmailTemplateResponse> saveEmailTemplate(@RequestBody SaveEmailTemplateRequest req) {
         return emailTemplateService.saveEmailTemplate(req);
+    }
+
+    /**
+     * Load email template by its name
+     * @param templateName
+     */
+    @GetMapping("")
+    public ApiResponse<LoadEmailTemplateResponse> loadEmailTemplate(@RequestParam String templateName) {
+        return emailTemplateService.loadEmailTemplate(templateName);
     }
 
 }
