@@ -41,7 +41,7 @@ public class Email {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "STATUS")
+    @Column(name = "STATUS", columnDefinition = "varchar(40)")
     EmailStatus status = EmailStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY)
