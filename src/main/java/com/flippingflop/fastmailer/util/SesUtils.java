@@ -4,9 +4,12 @@ import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
 import com.flippingflop.fastmailer.exception.model.CustomValidationException;
 import com.flippingflop.fastmailer.model.vo.EmailTemplate;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * This class manages all communications for SES settings.
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SesUtils {
 
+    final Gson gson;
     final AmazonSimpleEmailService sesClient;
 
     /**
@@ -62,6 +66,29 @@ public class SesUtils {
         } catch (TemplateDoesNotExistException e) {
             log.info(e);
             return null;
+        }
+    }
+
+    /**
+     * Send email using template.
+     * @param templateName
+     * @param senderEmail
+     * @param recipientEmail
+     * @param variables
+     * @throws RuntimeException
+     *      indicates that sending email has failed.
+     */
+    public void sendTemplateEmail(String templateName, String senderEmail, String recipientEmail, Map<String, String> variables) {
+        try {
+            Destination destination = new Destination().withToAddresses(recipientEmail);
+            SendTemplatedEmailRequest request = new SendTemplatedEmailRequest()
+                    .withTemplate(templateName)
+                    .withSource(senderEmail)
+                    .withDestination(destination)
+                    .withTemplateData(gson.toJson(variables));
+            sesClient.sendTemplatedEmail(request);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

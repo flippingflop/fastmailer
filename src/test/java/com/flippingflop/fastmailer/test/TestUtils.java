@@ -1,5 +1,7 @@
 package com.flippingflop.fastmailer.test;
 
+import com.flippingflop.fastmailer.model.enums.email.EmailStatus;
+import com.flippingflop.fastmailer.model.vo.Email;
 import com.flippingflop.fastmailer.model.vo.EmailTemplate;
 import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
 import com.flippingflop.fastmailer.util.SequenceUtils;
@@ -33,6 +35,15 @@ public class TestUtils {
 
     public EmailTemplate saveEmailTemplate() {
         return emailTemplateRepository.save(createEmailTemplate());
+    }
+
+    public Email createEmail() {
+        return Email.builder()
+                .senderEmail(SequenceUtils.getString(12) + "@example.com")
+                .recipientEmail(SequenceUtils.getString(12) + "@example.com")
+                .emailTemplate(createEmailTemplate())
+                .status(EmailStatus.PENDING)
+                .build();
     }
 
 }

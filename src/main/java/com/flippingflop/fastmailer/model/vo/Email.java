@@ -21,7 +21,8 @@ import java.util.Map;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "email", indexes = {
         @Index(name = "IDX_IS_DELETED", columnList = "IS_DELETED"),
-        @Index(name = "IDX_UNIQUE_KEY", columnList = "UNIQUE_KEY", unique = true)
+        @Index(name = "IDX_UNIQUE_KEY", columnList = "UNIQUE_KEY", unique = true),
+        @Index(name = "IDX_STATUS", columnList = "STATUS")
 })
 public class Email {
 
@@ -69,6 +70,20 @@ public class Email {
         if (isDeleted && deletedAt == null) {
             deletedAt = Instant.now();
         }
+    }
+
+    public void markAsSentSuccessfully() {
+        if (this.status != EmailStatus.PENDING) {
+            throw new IllegalStateException("Cannot mark as sending if not pending");
+        }
+        this.status = EmailStatus.SUCCESS;
+    }
+
+    public void markAsFailed() {
+        if (this.status != EmailStatus.PENDING) {
+            throw new IllegalStateException("Cannot mark as failed if not pending");
+        }
+        this.status = EmailStatus.FAIL;
     }
 
 }

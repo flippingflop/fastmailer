@@ -1,6 +1,8 @@
 package com.flippingflop.fastmailer.service;
 
 import com.flippingflop.fastmailer.exception.model.CustomValidationException;
+import com.flippingflop.fastmailer.model.enums.email.EmailStatus;
+import com.flippingflop.fastmailer.model.vo.Email;
 import com.flippingflop.fastmailer.model.vo.EmailTemplate;
 import com.flippingflop.fastmailer.repository.EmailRepository;
 import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
@@ -45,6 +47,18 @@ public class EmailValidator {
                 .collect(Collectors.toSet());
         if (!availableKeySet.containsAll(templateData.keySet())) {
             throw new CustomValidationException(3, "Invalid variable key provided.");
+        }
+    }
+
+    public void sendTemplateEmailValidate(Email email) {
+        /* Check if the email is persisted. */
+        if (email.getId() == null) {
+            throw new CustomValidationException("Email must be persisted before sending.");
+        }
+
+        /* Check if the email has already attempted to send. */
+        if (!email.getStatus().equals(EmailStatus.PENDING)) {
+            throw new CustomValidationException("Inappropriate state of email.");
         }
     }
 
