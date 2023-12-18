@@ -1,2 +1,3 @@
 GET {{host}}/api/v1/email-template?templateName={{templateName}}
 Content-Type: application/json
+Authorization: {{authorization}}
