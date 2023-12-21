@@ -2,9 +2,12 @@ package com.flippingflop.fastmailer.service;
 
 import com.flippingflop.fastmailer.model.enums.email.EmailStatus;
 import com.flippingflop.fastmailer.model.vo.Email;
+import com.flippingflop.fastmailer.model.vo.EmailSendAttempt;
 import com.flippingflop.fastmailer.model.vo.EmailTemplate;
 import com.flippingflop.fastmailer.repository.EmailRepository;
+import com.flippingflop.fastmailer.repository.EmailSendAttemptRepository;
 import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
+import com.flippingflop.fastmailer.util.ExceptionUtils;
 import com.flippingflop.fastmailer.util.SesUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -25,6 +28,7 @@ public class EmailService {
     final EmailValidator emailValidator;
     final EmailRepository emailRepository;
     final EmailTemplateRepository emailTemplateRepository;
+    final EmailSendAttemptRepository emailSendAttemptRepository;
 
     /**
      * It does not send email immediately but save email as a pending state.
@@ -68,7 +72,7 @@ public class EmailService {
     }
 
     /**
-     * Send an email using SES template.
+     * Send an email using SES template and save send history.
      * The email must be persisted before being passed as a parameter.
      * This method works on a separate transaction to persist its sending attempt result,
      * regardless of the status of any existing transaction.
@@ -79,10 +83,12 @@ public class EmailService {
         /* Validate */
         emailValidator.sendTemplateEmailValidate(email);
 
-        /* Update attempt result */
-        emailRepository.save(email);
+        /* Create email send attempt. */
+        EmailSendAttempt attempt = EmailSendAttempt.builder()
+                .email(email)
+                .build();
 
-        /* Send the email using SES template. */
+        /* Send the email using SES template and update its status. */
         try {
             sesUtils.sendTemplateEmail(
                     email.getEmailTemplate().getTemplateName(),
@@ -93,8 +99,16 @@ public class EmailService {
 
             email.markAsSentSuccessfully();
         } catch (RuntimeException e) {
-            log.error(e);
             email.markAsFailed();
+            attempt.recordFailure(ExceptionUtils.retrieveExceptionInfo(e));
+        }
+
+        /* Update email status and persist attempt history. */
+        try {
+            emailRepository.save(email);
+            emailSendAttemptRepository.save(attempt);
+        } catch (Exception e) {
+            log.error(e);
         }
     }
 
