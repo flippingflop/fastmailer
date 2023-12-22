@@ -92,4 +92,26 @@ public class SesUtils {
         }
     }
 
+    /**
+     * Modify email template by its name.
+     * @param templateName
+     * @param subjectPart
+     * @param htmlPart
+     * @param textPart
+     */
+    public void modifyEmailTemplate(String templateName, String subjectPart, String htmlPart, String textPart) {
+        Template template = new Template()
+                .withTemplateName(templateName)
+                .withSubjectPart(subjectPart)
+                .withHtmlPart(htmlPart)
+                .withTextPart(textPart);
+
+        try {
+            UpdateTemplateRequest request = new UpdateTemplateRequest().withTemplate(template);
+            sesClient.updateTemplate(request);
+        } catch (TemplateDoesNotExistException | InvalidTemplateException e) {
+            throw new CustomValidationException(e.getMessage());
+        }
+    }
+
 }

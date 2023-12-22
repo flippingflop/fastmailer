@@ -2,6 +2,7 @@ package com.flippingflop.fastmailer.service;
 
 import com.flippingflop.fastmailer.exception.model.CustomValidationException;
 import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
+import com.flippingflop.fastmailer.rest.dto.emailTemplate.ModifyEmailTemplateRequest;
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,10 @@ public class EmailTemplateValidator {
         if (keyNotConsumed) {
             throw new CustomValidationException(3, "Variable key not consumed within HTML contents.");
         }
+    }
+
+    public void modifyEmailTemplateValidate(ModifyEmailTemplateRequest req) {
+
     }
 
 }

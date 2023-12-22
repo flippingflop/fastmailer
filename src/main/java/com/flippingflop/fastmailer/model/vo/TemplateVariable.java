@@ -15,7 +15,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "template_variable", indexes = {
-        @Index(name = "IDX_KEY_NAME", columnList = "KEY_NAME")
+        @Index(name = "IDX_KEY_NAME", columnList = "KEY_NAME"),
+        @Index(name = "IDX_IS_DELETED", columnList = "IS_DELETED")
 })
 public class TemplateVariable {
 
@@ -39,11 +40,26 @@ public class TemplateVariable {
     @Column(name = "CREATED_AT")
     Instant createdAt;
 
+    @Column(name = "IS_DELETED")
+    Boolean isDeleted;
+
+    @Column(name = "DELETED_AT")
+    Instant deletedAt;
+
+    public void delete() {
+        this.isDeleted = true;
+        this.deletedAt = Instant.now();
+    }
+
     @Builder
     public TemplateVariable(String keyName, String defaultValue, EmailTemplate emailTemplate) {
         this.keyName = keyName;
         this.defaultValue = defaultValue;
         this.emailTemplate = emailTemplate;
+    }
+
+    public void changeDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 
 }

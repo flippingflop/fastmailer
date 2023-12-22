@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
@@ -49,7 +51,12 @@ public class EmailTemplate {
 
     @Builder.Default
     @OneToMany(mappedBy = "emailTemplate", cascade = CascadeType.PERSIST)
+    @Where(clause = "IS_DELETED = false")
     List<TemplateVariable> templateVariableList = new ArrayList<>();
+
+    @LastModifiedDate
+    @Column(name = "MODIFIED_AT")
+    Instant modifiedAt;
 
     @PreUpdate
     void preUpdate() {
@@ -70,6 +77,11 @@ public class EmailTemplate {
 
         this.templateVariableList.add(templateVariable);
         templateVariable.setEmailTemplate(this);
+    }
+
+    public void modify(EmailTemplate emailTemplate) {
+        this.subject = emailTemplate.getSubject();
+        this.htmlContents = emailTemplate.getHtmlContents();
     }
 
 }

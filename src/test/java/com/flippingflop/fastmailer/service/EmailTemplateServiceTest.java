@@ -4,11 +4,9 @@ import com.flippingflop.fastmailer.exception.model.CustomValidationException;
 import com.flippingflop.fastmailer.model.vo.EmailTemplate;
 import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
 import com.flippingflop.fastmailer.rest.dto.ApiResponse;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.LoadEmailTemplateResponse;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequest;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequestTest;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
+import com.flippingflop.fastmailer.rest.dto.emailTemplate.*;
 import com.flippingflop.fastmailer.test.MysqlTestContainerConfig;
+import com.flippingflop.fastmailer.test.TestUtils;
 import com.flippingflop.fastmailer.util.SequenceUtils;
 import com.flippingflop.fastmailer.util.SesUtils;
 import org.junit.jupiter.api.Nested;
@@ -31,6 +29,8 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(initializers = MysqlTestContainerConfig.MysqlTestContainerInitializer.class)
 class EmailTemplateServiceTest {
 
+    @Autowired
+    TestUtils testUtils;
     @Autowired
     EmailTemplateService emailTemplateService;
     @MockBean
@@ -116,6 +116,39 @@ class EmailTemplateServiceTest {
 
             /* then */
             assertEquals(1, e.getCode());
+        }
+
+    }
+
+    @Nested
+    class modifyEmailTemplate {
+
+        @InjectMocks
+        EmailTemplateService emailTemplateServiceMock;
+        @Mock
+        EmailTemplateValidator emailTemplateValidatorMock;
+        @Mock
+        EmailTemplateRepository emailTemplateRepositoryMock;
+        @Mock
+        SesUtils sesUtilsMock;
+
+        @Test
+        void success() {
+            /* given */
+            ModifyEmailTemplateRequest req = new ModifyEmailTemplateRequestTest();
+            EmailTemplate existingTemplate = testUtils.createEmailTemplate();
+
+            doReturn(existingTemplate).when(emailTemplateRepositoryMock).findByTemplateNameAndIsDeleted(anyString(), any());
+
+            /* when */
+            ApiResponse<ModifyEmailTemplateResponse> res = emailTemplateServiceMock.modifyEmailTemplate(req);
+
+            /* then */
+            assertEquals(1, res.getStatus());
+            assertNotNull(res.getData().getTemplateName());
+
+            verify(emailTemplateValidatorMock).modifyEmailTemplateValidate(any());
+            verify(emailTemplateRepositoryMock).findByTemplateNameAndIsDeleted(anyString(), any());
         }
 
     }
