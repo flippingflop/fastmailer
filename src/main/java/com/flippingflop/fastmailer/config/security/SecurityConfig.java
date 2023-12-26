@@ -1,7 +1,7 @@
 package com.flippingflop.fastmailer.config.security;
 
-import com.flippingflop.fastmailer.filter.TokenRetrieveFilter;
-import org.springframework.beans.factory.annotation.Value;
+import com.flippingflop.fastmailer.filter.TokenAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,10 +15,10 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${auth.rest.token}")
-    String authToken;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,7 +31,7 @@ public class SecurityConfig {
                                 .hasAuthority("ROLE_USER")
                 )
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new TokenRetrieveFilter(authToken), AuthorizationFilter.class);
+                .addFilterBefore(tokenAuthenticationFilter, AuthorizationFilter.class);
         return http.build();
     }
 
