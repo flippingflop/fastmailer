@@ -7,8 +7,12 @@ import com.flippingflop.fastmailer.model.vo.EmailTemplate;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.mail.internet.MimeUtility;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
@@ -18,6 +22,9 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class SesUtils {
+
+    @Value("${fastmailer.source-name}")
+    String sourceName;
 
     final Gson gson;
     final AmazonSimpleEmailService sesClient;
@@ -83,13 +90,30 @@ public class SesUtils {
             Destination destination = new Destination().withToAddresses(recipientEmail);
             SendTemplatedEmailRequest request = new SendTemplatedEmailRequest()
                     .withTemplate(templateName)
-                    .withSource(senderEmail)
+                    .withSource(encodeSourceName(sourceName) + '<' + senderEmail + '>')
                     .withDestination(destination)
                     .withTemplateData(gson.toJson(variables));
             sesClient.sendTemplatedEmail(request);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Generate source name of email. It encodes given string using RFC 2047 MIME so that source can be consumed by SES.
+     * @param name
+     * @return
+     * - The encoded name String<br>
+     * - null if encoding fails or empty name provided
+     */
+    private String encodeSourceName(String name) {
+        try {
+            return StringUtils.hasLength(name) ? MimeUtility.encodeText(name, "utf-8", "Q") : null;
+        } catch (UnsupportedEncodingException e) {
+            log.error(e);
+        }
+
+        return null;
     }
 
 }
