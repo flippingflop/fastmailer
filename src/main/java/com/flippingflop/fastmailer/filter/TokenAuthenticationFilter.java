@@ -67,6 +67,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         if (token.equals(authToken)) {
             Set<GrantedAuthority> authorities = new HashSet<>();
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
             Authentication authentication = new PreAuthenticatedAuthenticationToken(null, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
