@@ -6,6 +6,7 @@ import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateReque
 import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
 import com.flippingflop.fastmailer.service.EmailTemplateService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +21,7 @@ public class EmailTemplateController {
      * @param req
      */
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ApiResponse<SaveEmailTemplateResponse> saveEmailTemplate(@RequestBody SaveEmailTemplateRequest req) {
         return emailTemplateService.saveEmailTemplate(req);
     }
@@ -29,6 +31,7 @@ public class EmailTemplateController {
      * @param templateName
      */
     @GetMapping("")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ApiResponse<LoadEmailTemplateResponse> loadEmailTemplate(@RequestParam String templateName) {
         return emailTemplateService.loadEmailTemplate(templateName);
     }
