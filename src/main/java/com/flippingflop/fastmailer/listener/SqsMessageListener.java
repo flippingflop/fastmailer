@@ -65,7 +65,8 @@ public class SqsMessageListener {
         String receiptHandle = headers.get("Sqs_ReceiptHandle", String.class);
 
         return "[SQS message Id]: " + id +
-                "\n[Sqs_ReceiptHandle]: " + receiptHandle;
+                "\n[Sqs_ReceiptHandle]: " + receiptHandle +
+                "\n[SQS message payload]: " + message.getPayload();
     }
 
 }
