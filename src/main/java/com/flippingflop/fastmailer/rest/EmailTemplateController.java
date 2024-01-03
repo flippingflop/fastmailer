@@ -1,9 +1,7 @@
 package com.flippingflop.fastmailer.rest;
 
 import com.flippingflop.fastmailer.rest.dto.ApiResponse;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.LoadEmailTemplateResponse;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequest;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
+import com.flippingflop.fastmailer.rest.dto.emailTemplate.*;
 import com.flippingflop.fastmailer.service.EmailTemplateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +32,17 @@ public class EmailTemplateController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ApiResponse<LoadEmailTemplateResponse> loadEmailTemplate(@RequestParam String templateName) {
         return emailTemplateService.loadEmailTemplate(templateName);
+    }
+
+    /**
+     * Delete email template from SES and database.
+     * @param req
+     * @return
+     */
+    @DeleteMapping("")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ApiResponse<DeleteEmailTemplateResponse> deleteEmailTemplate(@RequestBody DeleteEmailTemplateRequest req) {
+        return emailTemplateService.deleteEmailTemplate(req);
     }
 
 }

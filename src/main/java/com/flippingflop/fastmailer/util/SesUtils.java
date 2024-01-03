@@ -25,12 +25,15 @@ public class SesUtils {
 
     @Value("${fastmailer.source-name}")
     String sourceName;
+    @Value("${fastmailer.email-template.prefix}")
+    String emailTemplatePrefix;
 
     final Gson gson;
     final AmazonSimpleEmailService sesClient;
 
     /**
-     * Upload email template to SES
+     * Upload email template to SES.
+     * Prefix is being added to templateName before uploading.
      * @param templateName
      * @param subjectPart
      * @param htmlPart
@@ -38,7 +41,7 @@ public class SesUtils {
      */
     public void saveEmailTemplate(String templateName, String subjectPart, String htmlPart, String textPart) {
         Template template = new Template();
-        template.setTemplateName(templateName);
+        template.setTemplateName(this.applyTemplateNamePrefix(templateName));
         template.setSubjectPart(subjectPart);
         template.setHtmlPart(htmlPart);
         template.setTextPart(textPart);
@@ -54,14 +57,14 @@ public class SesUtils {
     /**
      * Load email template from SES by its name.<br>
      * Since the result data is generated from SES object, it only contains templateName, subject, htmlContents.
-     * @param templateName
+     * @param templateName The name of email template to load. Prefix is being added.
      * @return
      * - The template data generated from SES object.<br>
      * - null if template does not exist.
      */
     public EmailTemplate loadEmailTemplate(String templateName) {
         try {
-            GetTemplateRequest request = new GetTemplateRequest().withTemplateName(templateName);
+            GetTemplateRequest request = new GetTemplateRequest().withTemplateName(this.applyTemplateNamePrefix(templateName));
             GetTemplateResult result = sesClient.getTemplate(request);
             Template template = result.getTemplate();
 
@@ -78,6 +81,7 @@ public class SesUtils {
 
     /**
      * Send email using template.
+     * Prefix is being added to templateName.
      * @param templateName
      * @param senderEmail
      * @param recipientEmail
@@ -89,7 +93,7 @@ public class SesUtils {
         try {
             Destination destination = new Destination().withToAddresses(recipientEmail);
             SendTemplatedEmailRequest request = new SendTemplatedEmailRequest()
-                    .withTemplate(templateName)
+                    .withTemplate(this.applyTemplateNamePrefix(templateName))
                     .withSource(encodeSourceName(sourceName) + '<' + senderEmail + '>')
                     .withDestination(destination)
                     .withTemplateData(gson.toJson(variables));
@@ -97,6 +101,45 @@ public class SesUtils {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Delete email template.
+     * @param templateName  Name of the email template with prefix defined as environment variable
+     * @return
+     * - true if template has existed and deleted.
+     * - false if template does it exist.
+     */
+    public boolean deleteEmailTemplate(String templateName) {
+        /* Return false if template does not exist. */
+        try {
+            GetTemplateRequest request = new GetTemplateRequest().withTemplateName(this.applyTemplateNamePrefix(templateName));
+            sesClient.getTemplate(request);
+        } catch (TemplateDoesNotExistException e) {
+            return false;
+        }
+
+        /* Delete email template and return true. */
+        DeleteTemplateRequest request = new DeleteTemplateRequest();
+        request.setTemplateName(this.applyTemplateNamePrefix(templateName));
+        sesClient.deleteTemplate(request);
+        return true;
+    }
+
+    /**
+     * Add prefix to given template name.
+     * Prefix value is set as environment variable.
+     * If given template name already have prefix, it returns the name as it is.
+     * @param rawTemplateName
+     * @return
+     * Template name with prefix
+     */
+    public String applyTemplateNamePrefix(String rawTemplateName) {
+        if (rawTemplateName.startsWith(emailTemplatePrefix)) {
+            return rawTemplateName;
+        }
+
+        return emailTemplatePrefix + rawTemplateName;
     }
 
     /**

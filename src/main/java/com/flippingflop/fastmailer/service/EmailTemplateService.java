@@ -4,9 +4,7 @@ import com.flippingflop.fastmailer.exception.model.CustomValidationException;
 import com.flippingflop.fastmailer.model.vo.EmailTemplate;
 import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
 import com.flippingflop.fastmailer.rest.dto.ApiResponse;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.LoadEmailTemplateResponse;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequest;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
+import com.flippingflop.fastmailer.rest.dto.emailTemplate.*;
 import com.flippingflop.fastmailer.util.SesUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,6 +48,25 @@ public class EmailTemplateService {
         EmailTemplate responseTemplate = templateFromSes != null ? templateFromSes : templateFromDb;
         LoadEmailTemplateResponse res = new LoadEmailTemplateResponse(responseTemplate, templateFromSes != null, templateFromDb != null);
         return new ApiResponse<>(1, "Template loaded.", res);
+    }
+
+    @Transactional
+    public ApiResponse<DeleteEmailTemplateResponse> deleteEmailTemplate(DeleteEmailTemplateRequest req) {
+        /* Update template to deleted status */
+        EmailTemplate emailTemplate = emailTemplateRepository.findByTemplateNameAndIsDeleted(req.getTemplateName(), false);
+        boolean deletedFromDatabase = false;
+        if (emailTemplate != null) {
+            emailTemplate.delete();
+            deletedFromDatabase = true;
+        }
+
+        /* Delete template from SES */
+        String templateNameWithPrefix = req.getTemplateName();
+        boolean deletedFromSes = sesUtils.deleteEmailTemplate(templateNameWithPrefix);
+
+        /* Response the deletion result from SES and database. */
+        DeleteEmailTemplateResponse res = new DeleteEmailTemplateResponse(deletedFromSes, deletedFromDatabase);
+        return new ApiResponse<>(1, "Template deleted.", res);
     }
 
 }

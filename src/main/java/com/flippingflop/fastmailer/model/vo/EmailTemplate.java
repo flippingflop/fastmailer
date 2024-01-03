@@ -51,11 +51,9 @@ public class EmailTemplate {
     @OneToMany(mappedBy = "emailTemplate", cascade = CascadeType.PERSIST)
     List<TemplateVariable> templateVariableList = new ArrayList<>();
 
-    @PreUpdate
-    void preUpdate() {
-        if (isDeleted && deletedAt == null) {
-            deletedAt = Instant.now();
-        }
+    public void delete() {
+        this.isDeleted = true;
+        this.deletedAt = Instant.now();
     }
 
     public void removeTemplateVariable(TemplateVariable templateVariable) {

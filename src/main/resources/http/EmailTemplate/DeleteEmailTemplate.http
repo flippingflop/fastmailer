@@ -1,0 +1,7 @@
+DELETE {{host}}/api/v1/email-template
+Content-Type: application/json
+Authorization: {{authorization}}
+
+{
+  "templateName" : "template-name"
+}
