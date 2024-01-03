@@ -38,7 +38,7 @@ public class EmailValidator {
         /* Check templateName exists. */
         EmailTemplate emailTemplate = emailTemplateRepository.findByTemplateNameAndIsDeleted(templateName, false);
         if (emailTemplate == null) {
-            throw new CustomValidationException(2, "Template does not exist.");
+            throw new CustomValidationException(2, "Template \"" + templateName + "\" does not exist.");
         }
 
         /* Check if invalid key provided. */
