@@ -134,7 +134,7 @@ public class SesUtils {
      * @return
      * Template name with prefix
      */
-    public String applyTemplateNamePrefix(String rawTemplateName) {
+    private String applyTemplateNamePrefix(String rawTemplateName) {
         if (rawTemplateName.startsWith(emailTemplatePrefix)) {
             return rawTemplateName;
         }
