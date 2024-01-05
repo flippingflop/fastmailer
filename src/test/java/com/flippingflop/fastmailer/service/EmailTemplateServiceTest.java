@@ -4,11 +4,9 @@ import com.flippingflop.fastmailer.exception.model.CustomValidationException;
 import com.flippingflop.fastmailer.model.vo.EmailTemplate;
 import com.flippingflop.fastmailer.repository.EmailTemplateRepository;
 import com.flippingflop.fastmailer.rest.dto.ApiResponse;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.LoadEmailTemplateResponse;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequest;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateRequestTest;
-import com.flippingflop.fastmailer.rest.dto.emailTemplate.SaveEmailTemplateResponse;
+import com.flippingflop.fastmailer.rest.dto.emailTemplate.*;
 import com.flippingflop.fastmailer.test.MysqlTestContainerConfig;
+import com.flippingflop.fastmailer.test.TestUtils;
 import com.flippingflop.fastmailer.util.SequenceUtils;
 import com.flippingflop.fastmailer.util.SesUtils;
 import org.junit.jupiter.api.Nested;
@@ -35,6 +33,8 @@ class EmailTemplateServiceTest {
     EmailTemplateService emailTemplateService;
     @MockBean
     SesUtils sesUtilsMock;
+    @Autowired
+    TestUtils testUtils;
 
     @Nested
     class saveEmailTemplate {
@@ -116,6 +116,42 @@ class EmailTemplateServiceTest {
 
             /* then */
             assertEquals(1, e.getCode());
+        }
+
+    }
+
+    @Nested
+    class deleteEmailTemplate {
+
+        @InjectMocks
+        EmailTemplateService emailTemplateServiceMock;
+        @Mock
+        EmailTemplateRepository emailTemplateRepositoryMock;
+        @Mock
+        SesUtils sesUtilsMock;
+
+        @Test
+        void deleteEmailTemplate_success() {
+            /* given */
+            EmailTemplate emailTemplate = testUtils.createEmailTemplate();
+            DeleteEmailTemplateRequestTest req = new DeleteEmailTemplateRequestTest(emailTemplate.getTemplateName());
+
+            // mock
+            doReturn(emailTemplate).when(emailTemplateRepositoryMock).findByTemplateNameAndIsDeleted(eq(emailTemplate.getTemplateName()), anyBoolean());
+            doReturn(true).when(sesUtilsMock).deleteEmailTemplate(anyString());
+
+            /* when */
+            ApiResponse<DeleteEmailTemplateResponse> res = emailTemplateServiceMock.deleteEmailTemplate(req);
+
+            /* then */
+            assertEquals(1, res.getStatus());
+
+            verify(emailTemplateRepositoryMock).findByTemplateNameAndIsDeleted(anyString(), anyBoolean());
+            verify(sesUtilsMock).deleteEmailTemplate(anyString());
+
+            assertTrue(emailTemplate.getIsDeleted());
+            assertTrue(res.getData().isDeletedFromSes());
+            assertTrue(res.getData().isDeletedFromDatabase());
         }
 
     }
