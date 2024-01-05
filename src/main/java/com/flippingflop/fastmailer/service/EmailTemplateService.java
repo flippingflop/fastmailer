@@ -61,8 +61,7 @@ public class EmailTemplateService {
         }
 
         /* Delete template from SES */
-        String templateNameWithPrefix = req.getTemplateName();
-        boolean deletedFromSes = sesUtils.deleteEmailTemplate(templateNameWithPrefix);
+        boolean deletedFromSes = sesUtils.deleteEmailTemplate(req.getTemplateName());
 
         /* Response the deletion result from SES and database. */
         DeleteEmailTemplateResponse res = new DeleteEmailTemplateResponse(deletedFromSes, deletedFromDatabase);
