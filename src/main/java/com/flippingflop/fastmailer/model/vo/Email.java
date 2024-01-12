@@ -67,6 +67,7 @@ public class Email {
     @Column(name = "DELETED_AT")
     Instant deletedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "email")
     List<EmailSendAttempt> emailSendAttemptList = new ArrayList<>();
 
