@@ -156,4 +156,39 @@ class EmailTemplateServiceTest {
 
     }
 
+    @Nested
+    class modifyEmailTemplate {
+
+        @InjectMocks
+        EmailTemplateService emailTemplateServiceMock;
+        @Mock
+        EmailTemplateRepository emailTemplateRepositoryMock;
+        @Mock
+        SesUtils sesUtilsMock;
+        @Mock
+        EmailTemplateValidator emailTemplateValidatorMock;
+
+        @Test
+        void modifyEmailTemplate_success() {
+            /* given */
+            // req
+            ModifyEmailTemplateRequest req = new ModifyEmailTemplateRequestTest();
+
+            // mock
+            doNothing().when(emailTemplateValidatorMock).modifyEmailTemplateValidate(eq(req));
+            doReturn(null).when(emailTemplateRepositoryMock).findByTemplateNameAndIsDeleted(eq(req.getTemplateName()), eq(false));
+            doReturn(req.toVo()).when(emailTemplateRepositoryMock).save(any());
+            doNothing().when(sesUtilsMock).updateEmailTemplate(any(), any(), any(), any());
+
+            /* when */
+            ApiResponse<ModifyEmailTemplateResponse> res = emailTemplateServiceMock.modifyEmailTemplate(req);
+
+            /* then */
+            assertEquals(1, res.getStatus());
+
+            assertEquals(req.getTemplateName(), res.getData().getTemplateName());
+        }
+
+    }
+
 }

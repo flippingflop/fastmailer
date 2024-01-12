@@ -68,4 +68,32 @@ public class EmailTemplateService {
         return new ApiResponse<>(1, "Template deleted.", res);
     }
 
+    @Transactional
+    public ApiResponse<ModifyEmailTemplateResponse> modifyEmailTemplate(ModifyEmailTemplateRequest req) {
+        /* Validate */
+        emailTemplateValidator.modifyEmailTemplateValidate(req);
+
+        /* Delete existing template. */
+        EmailTemplate previousTemplate = emailTemplateRepository.findByTemplateNameAndIsDeleted(req.getTemplateName(), false);
+        if (previousTemplate != null) {
+            previousTemplate.delete();
+        }
+
+        /* Save new template. */
+        EmailTemplate newTemplate = req.toVo();
+        emailTemplateRepository.save(newTemplate);
+
+        /* Modify SES template. */
+        sesUtils.updateEmailTemplate(
+                newTemplate.getTemplateName(),
+                newTemplate.getSubject(),
+                newTemplate.getHtmlContents(),
+                null
+        );
+
+        /* Response the result template. */
+        ModifyEmailTemplateResponse res = new ModifyEmailTemplateResponse(newTemplate);
+        return new ApiResponse<>(1, "Template modified.", res);
+    }
+
 }

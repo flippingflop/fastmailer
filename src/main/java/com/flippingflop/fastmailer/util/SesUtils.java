@@ -127,6 +127,24 @@ public class SesUtils {
     }
 
     /**
+     * Modify SES template.
+     * @param templateName
+     * @param subjectPart
+     * @param htmlPart
+     * @param textPart
+     */
+    public void updateEmailTemplate(String templateName, String subjectPart, String htmlPart, String textPart) {
+        Template template = new Template();
+        template.setTemplateName(this.applyTemplateNamePrefix(templateName));
+        template.setSubjectPart(subjectPart);
+        template.setHtmlPart(htmlPart);
+        template.setTextPart(textPart);
+
+        UpdateTemplateRequest request = new UpdateTemplateRequest().withTemplate(template);
+        sesClient.updateTemplate(request);
+    }
+
+    /**
      * Add prefix to given template name.
      * Prefix value is set as environment variable.
      * If given template name already have prefix, it returns the name as it is.
@@ -134,7 +152,7 @@ public class SesUtils {
      * @return
      * Template name with prefix
      */
-    private String applyTemplateNamePrefix(String rawTemplateName) {
+    public String applyTemplateNamePrefix(String rawTemplateName) {
         if (rawTemplateName.startsWith(emailTemplatePrefix)) {
             return rawTemplateName;
         }

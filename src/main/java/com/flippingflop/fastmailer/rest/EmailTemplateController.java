@@ -45,4 +45,16 @@ public class EmailTemplateController {
         return emailTemplateService.deleteEmailTemplate(req);
     }
 
+    /**
+     * Modify email template from SES and database.
+     * If template only exists on ses, it inserts into database.
+     * @param req
+     * @return
+     */
+    @PutMapping("")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ApiResponse<ModifyEmailTemplateResponse> modifyEmailTemplate(@RequestBody ModifyEmailTemplateRequest req) {
+        return emailTemplateService.modifyEmailTemplate(req);
+    }
+
 }
